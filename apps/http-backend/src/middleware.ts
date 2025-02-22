@@ -5,11 +5,9 @@ const JWT_SECRET= "secret"
 export function middleWare(req:Request,res:Response ,next:NextFunction){
     const token = req.headers["authorization"] || "";
 
-    const decoded = jwt.verify(token, JWT_SECRET )
+    const decoded = jwt.verify(token, JWT_SECRET ) as {userId :string};
 
     if(decoded){
-        //@ts-ignore
-        //how can you update the structure of request 
         req.userId = decoded.userId;
         next();
     }
@@ -20,3 +18,4 @@ export function middleWare(req:Request,res:Response ,next:NextFunction){
     }
 
 }
+
