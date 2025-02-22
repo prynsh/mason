@@ -122,7 +122,31 @@ app.get("/notes/bulk", middleWare, async (req:Request, res) => {
 });
 
 
-app.patch("/notes/:id", middleWare, async (req: Request, res: Response):Promise<any> => {
+
+app.get("/notes/:id", middleWare, async (req: Request, res: Response): Promise<any> => {
+    try {
+        const userId = req.userId; 
+        const noteId = req.params.id; 
+
+        if (!noteId) {
+            return res.status(400).json({ message: "Note ID is required" });
+        }
+
+        const note = await Note.findOne({ _id: noteId, userId }); 
+
+        if (!note) {
+            return res.status(404).json({ message: "Note not found or unauthorized" });
+        }
+
+        res.json({ note }); 
+    } catch (error) {
+        console.error("Error fetching note:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
+app.put("/notes/:id", middleWare, async (req: Request, res: Response): Promise<any> => {
     try {
         const userId = req.userId; 
         const noteId = req.params.id; 
@@ -138,7 +162,9 @@ app.patch("/notes/:id", middleWare, async (req: Request, res: Response):Promise<
             return res.status(404).json({ message: "Note not found or unauthorized" });
         }
 
+        if (updateData.title) note.title = updateData.title;
         if (updateData.content) note.content = updateData.content;
+        if (updateData.tags) note.tags = updateData.tags;
 
         await note.save(); 
 
@@ -148,6 +174,7 @@ app.patch("/notes/:id", middleWare, async (req: Request, res: Response):Promise<
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
 
 
 app.delete("/notes/:id", middleWare, async (req: Request, res: Response):Promise<any> => {

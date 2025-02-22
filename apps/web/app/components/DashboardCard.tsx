@@ -1,11 +1,12 @@
-"use client";
+"use client"
 import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useOutsideClick } from "../hooks/use-outside-click";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-
+import EditNoteModal from "./editModal"; 
+import { SearchBar } from "./searchBar";
 
 function stripHTMLTags(html: string) {
   const div = document.createElement("div");
@@ -16,14 +17,21 @@ function stripHTMLTags(html: string) {
 export function ExpandableCardDemo() {
   const [notes, setNotes] = useState<any[]>([]);
   const [active, setActive] = useState<any | boolean | null>(null);
+  const [filteredNotes, setFilteredNotes] = useState<any[]>([]); 
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null); 
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
-  const router = useRouter();
+  const router = useRouter()
 
   useEffect(() => {
     const fetchNotes = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          router.push("/signup");
+          return;
+        }
         const response = await axios.get("http://localhost:3001/notes/bulk", {
           headers: {
             Authorization: token,
@@ -32,6 +40,7 @@ export function ExpandableCardDemo() {
 
         if (response.status === 200) {
           setNotes(response.data.notes);
+          setFilteredNotes(response.data.notes);
         } else {
           console.error("Error fetching notes:", response.data.message);
         }
@@ -61,6 +70,36 @@ export function ExpandableCardDemo() {
   }, [active]);
 
   useOutsideClick(ref as React.RefObject<HTMLDivElement>, () => setActive(null));
+
+  const openModalWithNote = (noteId: string) => {
+    setSelectedNoteId(noteId);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedNoteId(null);
+  };
+
+  const handleNoteUpdate = (updatedNote: any) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => (note._id === updatedNote._id ? updatedNote : note))
+    );
+    closeModal(); 
+  };
+
+  const handleDelete = async (noteId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:3001/notes/${noteId}`, {
+        headers: { Authorization: token },
+      });
+      setNotes((prevNotes) => prevNotes.filter((note) => note._id !== noteId));
+    } catch (error) {
+      console.error("Error deleting note:", error);
+    }
+  };
+
 
   return (
     <>
@@ -104,7 +143,6 @@ export function ExpandableCardDemo() {
                   layoutId={`description-${active._id}-${id}`}
                   className="text-neutral-600 dark:text-neutral-400 mb-4"
                 >
-              
                   {stripHTMLTags(active.content)}
                 </motion.p>
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -119,58 +157,46 @@ export function ExpandableCardDemo() {
           </div>
         ) : null}
       </AnimatePresence>
+      <div className="flex justify-center mb-4">
+        <SearchBar notes={notes} setFilteredNotes={setFilteredNotes} />
+      </div>
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[1024px] mx-auto">
-        {notes.map((note) => (
+        {filteredNotes.map((note) => ( 
           <motion.div
-            layoutId={`card-${note._id}-${id}`}
             key={note._id}
-            onClick={() => setActive(note)}
             className="p-4 flex flex-col justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer bg-white dark:bg-gray-900 shadow-lg"
           >
-            <div className="flex">
-              <div className="flex-1">
-                <motion.h3
-                  layoutId={`title-${note._id}-${id}`}
-                  className="font-medium text-neutral-800 dark:text-neutral-200 text-lg"
-                >
+            <div className="flex justify-between">
+              <div className="flex-1" onClick={() => setActive(note)}>
+                <h3 className="font-medium text-neutral-800 dark:text-neutral-200 text-lg">
                   {note.title}
-                </motion.h3>
-                <motion.p
-                  layoutId={`description-${note._id}-${id}`}
-                  className="text-neutral-600 dark:text-neutral-400 text-sm mt-1"
-                >
-                  
+                </h3>
+                <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1">
                   {stripHTMLTags(note.content)}
-                </motion.p>
+                </p>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {note.tags.map((tag: string) => (
+                  {note.tags && note.tags.map((tag: string) => (
                     <span key={tag} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-xs rounded-full">
                       {tag}
                     </span>
                   ))}
                 </div>
               </div>
-              <div>
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push("/edit");
-                  }}
-                  variant="outline"
-                >
+              <div className="flex flex-col gap-2">
+                <Button onClick={() => openModalWithNote(note._id)} variant="outline">
                   Edit
+                </Button>
+                <Button onClick={() => handleDelete(note._id)} variant="destructive">
+                  Delete
                 </Button>
               </div>
             </div>
-            <motion.button
-              layoutId={`button-${note._id}-${id}`}
-              className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 dark:bg-gray-700 hover:bg-green-500 hover:text-white text-black dark:text-white mt-4 md:mt-0"
-            >
-              View
-            </motion.button>
           </motion.div>
         ))}
       </ul>
+      {isModalOpen && selectedNoteId && (
+        <EditNoteModal noteId={selectedNoteId} closeModal={closeModal} onNoteUpdate={handleNoteUpdate} />
+      )}
     </>
   );
 }

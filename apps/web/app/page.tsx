@@ -1,4 +1,5 @@
-import { ExpandableCardDemo } from "./components/hoverCard";
+import { ExpandableCardDemo } from "./components/DashboardCard";
+import Topbar from "./components/topBar";
 
 
 
@@ -7,7 +8,7 @@ export default function Page() {
   return (
     <div>
       <div>
-        Hello this is the Smart Notes Application
+        <Topbar/>
       </div>
       <div className="p-4">
         <ExpandableCardDemo/>
