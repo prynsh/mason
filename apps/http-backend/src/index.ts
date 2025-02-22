@@ -4,10 +4,13 @@ import { middleWare } from "./middleware";
 import {SignupSchema, SignInSchema, NotesSchema}  from "@repo/common/types"
 import { User , Note } from "@repo/db/client"
 import bcrypt from "bcrypt"
+import cors from "cors"
 
 
 const app = express();
 app.use(express.json());
+app.use(cors());
+
 
 const JWT_SECRET= "secret"
 
@@ -91,7 +94,8 @@ app.post("/notes/create", middleWare, async (req: Request, res: Response):Promis
             title: parsedData.data.title,
             content: parsedData.data.content,
             done: parsedData.data.done,
-            userId: userId 
+            tags:parsedData.data.tags,
+            userId: userId  
         });
 
         res.status(201).json({ message: "Note created successfully", note: newNote });

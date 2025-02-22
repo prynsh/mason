@@ -11,8 +11,14 @@ const userSchema = new mongoose.Schema({
 });
 
 const noteSchema = new mongoose.Schema({
+  title:{
+    type: String,
+  },
   content: {
     type: String,
+  },
+  tags:{
+    type: [String]
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
