@@ -93,7 +93,6 @@ app.post("/notes/create", middleWare, async (req: Request, res: Response):Promis
         const newNote = await Note.create({
             title: parsedData.data.title,
             content: parsedData.data.content,
-            done: parsedData.data.done,
             tags:parsedData.data.tags,
             userId: userId  
         });

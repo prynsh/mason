@@ -3,25 +3,35 @@ import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useOutsideClick } from "../hooks/use-outside-click";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+
+
+function stripHTMLTags(html: string) {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent || div.innerText || "";
+}
 
 export function ExpandableCardDemo() {
-  const [notes, setNotes] = useState<any[]>([]); 
-  const [active, setActive] = useState<any | boolean | null>(null); 
+  const [notes, setNotes] = useState<any[]>([]);
+  const [active, setActive] = useState<any | boolean | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const token = localStorage.getItem("token"); 
+        const token = localStorage.getItem("token");
         const response = await axios.get("http://localhost:3001/notes/bulk", {
           headers: {
-            Authorization: token, 
+            Authorization: token,
           },
         });
 
         if (response.status === 200) {
-          setNotes(response.data.notes); 
+          setNotes(response.data.notes);
         } else {
           console.error("Error fetching notes:", response.data.message);
         }
@@ -94,7 +104,8 @@ export function ExpandableCardDemo() {
                   layoutId={`description-${active._id}-${id}`}
                   className="text-neutral-600 dark:text-neutral-400 mb-4"
                 >
-                  {active.content}
+              
+                  {stripHTMLTags(active.content)}
                 </motion.p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {active.tags.map((tag: string) => (
@@ -112,29 +123,43 @@ export function ExpandableCardDemo() {
         {notes.map((note) => (
           <motion.div
             layoutId={`card-${note._id}-${id}`}
-            key={note._id} 
+            key={note._id}
             onClick={() => setActive(note)}
             className="p-4 flex flex-col justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer bg-white dark:bg-gray-900 shadow-lg"
           >
-            <div className="flex-1">
-              <motion.h3
-                layoutId={`title-${note._id}-${id}`}
-                className="font-medium text-neutral-800 dark:text-neutral-200 text-lg"
-              >
-                {note.title}
-              </motion.h3>
-              <motion.p
-                layoutId={`description-${note._id}-${id}`}
-                className="text-neutral-600 dark:text-neutral-400 text-sm mt-1"
-              >
-                {note.content}
-              </motion.p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {note.tags.map((tag: string) => (
-                  <span key={tag} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-xs rounded-full">
-                    {tag}
-                  </span>
-                ))}
+            <div className="flex">
+              <div className="flex-1">
+                <motion.h3
+                  layoutId={`title-${note._id}-${id}`}
+                  className="font-medium text-neutral-800 dark:text-neutral-200 text-lg"
+                >
+                  {note.title}
+                </motion.h3>
+                <motion.p
+                  layoutId={`description-${note._id}-${id}`}
+                  className="text-neutral-600 dark:text-neutral-400 text-sm mt-1"
+                >
+                  
+                  {stripHTMLTags(note.content)}
+                </motion.p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {note.tags.map((tag: string) => (
+                    <span key={tag} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-xs rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push("/edit");
+                  }}
+                  variant="outline"
+                >
+                  Edit
+                </Button>
               </div>
             </div>
             <motion.button

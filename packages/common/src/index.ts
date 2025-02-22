@@ -13,7 +13,6 @@ export const SignInSchema = z.object({
 export const NotesSchema = z.object({
     title: z.string(),
     content: z.string(),
-    done : z.boolean(),
     tags: z.string().array()
 })
 
