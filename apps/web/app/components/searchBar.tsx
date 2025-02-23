@@ -29,7 +29,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ notes, setFilteredNotes })
   };
 
   return (
-    <div className="relative w-64">
+    <div className="relative w-full">
       <input
         type="text"
         value={query}

@@ -1,11 +1,11 @@
+import CreatePage from "../components/CreateEditor";
 
-import MyComponent from '../components/textEditor';
 
-export default function Edit () {
+export default function Create () {
     
   return (
     <div>
-    <MyComponent/>
+    <CreatePage/>
     </div>
   )
 }

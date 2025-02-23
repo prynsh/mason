@@ -1,5 +1,7 @@
-import mongoose from "mongoose";
-mongoose.connect("mongodb+srv://Mason:WVnRatXunvZkdaih@mason.gko53.mongodb.net/smart_notes")
+import mongoose from "mongoose";  
+//"AIzaSyC4tbOPp06kyZKBCH8TMiQ5NYA4O7neTWg"
+mongoose.connect("mongodb+srv://Mason:WVnRatXunvZkdaih@mason.gko53.mongodb.net/smart_notes");
+
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -11,14 +13,18 @@ const userSchema = new mongoose.Schema({
 });
 
 const noteSchema = new mongoose.Schema({
-  title:{
+  title: {
     type: String,
   },
   content: {
     type: String,
   },
-  tags:{
+  tags: {
     type: [String]
+  },
+  aiSummary: {
+    type: String,
+    default: null  
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

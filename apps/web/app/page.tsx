@@ -13,6 +13,9 @@ export default function Page() {
       <div className="p-4">
         <ExpandableCardDemo/>
       </div>
+      <div>
+        {/* <Footer/> */}
+      </div>
     </div>
   );
 }

@@ -1,10 +1,13 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken"
-import { middleWare } from "./middleware";
 import {SignupSchema, SignInSchema, NotesSchema}  from "@repo/common/types"
 import { User , Note } from "@repo/db/client"
 import bcrypt from "bcrypt"
 import cors from "cors"
+import dotenv from "dotenv";
+import { middleWare } from "./middleware";
+
+dotenv.config();
 
 
 const app = express();
@@ -12,7 +15,6 @@ app.use(express.json());
 app.use(cors());
 
 
-const JWT_SECRET= "secret"
 
 
 app.post("/signup", async (req,res)=>{
@@ -51,19 +53,18 @@ app.post("/signin", async (req, res) => {
 
     try {
         const user = await User.findOne({ email: parsedData.data.email });
-        console.log(user)
         if (!user) {
             res.status(401).json({ message: "Invalid email" }); 
             return;
         }
 
-        const isPasswordValid = bcrypt.compare(parsedData.data.password, user.password as string);
+        const isPasswordValid = await bcrypt.compare(parsedData.data.password, user.password as string);
         if (!isPasswordValid) {
             res.status(401).json({ message: "Invalid password" });
             return;
         }
 
-        const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 
         res.json({
             message: "Signin successful",
@@ -76,33 +77,36 @@ app.post("/signin", async (req, res) => {
     }
 });
 
+
 app.post("/notes/create", middleWare, async (req: Request, res: Response):Promise<any> => {
     const parsedData = NotesSchema.safeParse(req.body);
-
+    
     if (!parsedData.success) {
-        return res.status(411).json({ message: "Incorrect Inputs" });
+        return res.status(400).json({ message: "Invalid input data." });
     }
 
     try {
-        const userId = req.userId; 
-
+        const userId = req.userId;
         if (!userId) {
-            return res.status(401).json({ message: "Unauthorized" });
+            return res.status(401).json({ message: "Unauthorized access." });
         }
 
         const newNote = await Note.create({
             title: parsedData.data.title,
             content: parsedData.data.content,
-            tags:parsedData.data.tags,
-            userId: userId  
+            tags: parsedData.data.tags,
+            aiSummary: parsedData.data.aiSummary || '',
+            userId
         });
 
         res.status(201).json({ message: "Note created successfully", note: newNote });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        console.error("Error creating note:", error);
+        res.status(500).json({ message: "Internal server error." });
     }
 });
+
+
 
 app.get("/notes/bulk", middleWare, async (req:Request, res) => {
     try {
@@ -123,27 +127,27 @@ app.get("/notes/bulk", middleWare, async (req:Request, res) => {
 
 
 
-app.get("/notes/:id", middleWare, async (req: Request, res: Response): Promise<any> => {
-    try {
-        const userId = req.userId; 
-        const noteId = req.params.id; 
+// app.get("/notes/:id", middleWare, async (req: Request, res: Response): Promise<any> => {
+//     try {
+//         const userId = req.userId; 
+//         const noteId = req.params.id; 
 
-        if (!noteId) {
-            return res.status(400).json({ message: "Note ID is required" });
-        }
+//         if (!noteId) {
+//             return res.status(400).json({ message: "Note ID is required" });
+//         }
 
-        const note = await Note.findOne({ _id: noteId, userId }); 
+//         const note = await Note.findOne({ _id: noteId, userId }); 
 
-        if (!note) {
-            return res.status(404).json({ message: "Note not found or unauthorized" });
-        }
+//         if (!note) {
+//             return res.status(404).json({ message: "Note not found or unauthorized" });
+//         }
 
-        res.json({ note }); 
-    } catch (error) {
-        console.error("Error fetching note:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
-});
+//         res.json({ note }); 
+//     } catch (error) {
+//         console.error("Error fetching note:", error);
+//         res.status(500).json({ message: "Internal server error" });
+//     }
+// });
 
 
 app.put("/notes/:id", middleWare, async (req: Request, res: Response): Promise<any> => {
