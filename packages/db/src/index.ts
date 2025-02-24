@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 
 dotenv.config();
 
-  mongoose.connect(process.env.DATABASE_URL)
+  mongoose.connect("mongodb+srv://Mason:WVnRatXunvZkdaih@mason.gko53.mongodb.net/smart_notes")
 
 const userSchema = new mongoose.Schema({
   email: {
