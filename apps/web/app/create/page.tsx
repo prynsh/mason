@@ -1,4 +1,4 @@
-import CreatePage from "../components/CreateEditor";
+import CreatePage from "../components/Create";
 
 
 export default function Create () {

@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
+import dotenv from "dotenv"
 
+
+dotenv.config();
 interface GenerateResult {
   generateContent: (params: GenerateParams) => Promise<string>;
   result: string | null;
@@ -14,7 +17,7 @@ interface GenerateParams {
 }
 
 const genAI = new GoogleGenerativeAI("AIzaSyC4tbOPp06kyZKBCH8TMiQ5NYA4O7neTWg");
-
+console.log(process.env.GENERATE_API as string)
 export const useGenerate = (): GenerateResult => {
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,7 +35,7 @@ export const useGenerate = (): GenerateResult => {
       const plainContent = content.replace(/<[^>]*>/g, '');
 
       const prompt = `Given the following note with title and content, please provide:
-        1. A brief summary  
+        A brief summary  
 
 Title: ${title}
 Content: ${plainContent}`;

@@ -15,10 +15,14 @@
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.2",
     "@repo/ui": "workspace:*",
+    "@types/dompurify": "^3.2.0",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dompurify": "^3.2.4",
+    "dotenv": "^16.4.7",
     "framer-motion": "^12.4.7",
+    "html-react-parser": "^5.2.2",
     "lucide-react": "^0.475.0",
     "motion": "^12.4.7",
     "next": "^15.1.6",
@@ -28,7 +32,8 @@
     "react-dom": "^19.0.0",
     "react-quill-new": "^3.3.3",
     "tailwind-merge": "^3.0.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^15.1.6",

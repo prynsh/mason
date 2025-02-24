@@ -113,7 +113,6 @@ app.get("/notes/bulk", middleWare, async (req:Request, res) => {
         const userId = req.userId; 
         
         const notes = await Note.find({ userId }); 
-        console.log(notes)
 
         res.json({
             message: "Notes fetched successfully",
@@ -126,25 +125,52 @@ app.get("/notes/bulk", middleWare, async (req:Request, res) => {
 });
 
 
+app.get("/notes/:id", middleWare, async (req: Request, res: Response): Promise<any> => {
+    try {
+        const userId = req.userId; 
+        const noteId = req.params.id; 
 
-// app.get("/notes/:id", middleWare, async (req: Request, res: Response): Promise<any> => {
+        if (!noteId) {
+            return res.status(400).json({ message: "Note ID is required" });
+        }
+
+        const note = await Note.findOne({ _id: noteId, userId }); 
+
+        if (!note) {
+            return res.status(404).json({ message: "Note not found or unauthorized" });
+        }
+
+        res.json({ note }); 
+    } catch (error) {
+        console.error("Error fetching note:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 //     try {
 //         const userId = req.userId; 
 //         const noteId = req.params.id; 
+//         const updateData = req.body; 
 
 //         if (!noteId) {
 //             return res.status(400).json({ message: "Note ID is required" });
 //         }
 
-//         const note = await Note.findOne({ _id: noteId, userId }); 
+//         const note = await Note.findOne({ _id: noteId, userId });
 
 //         if (!note) {
 //             return res.status(404).json({ message: "Note not found or unauthorized" });
 //         }
 
-//         res.json({ note }); 
+//         if (updateData.title) note.title = updateData.title;
+//         if (updateData.content) note.content = updateData.content;
+//         if (updateData.tags) note.tags = updateData.tags;
+
+//         await note.save(); 
+
+//         res.json({ message: "Note updated successfully", note });
 //     } catch (error) {
-//         console.error("Error fetching note:", error);
+//         console.error(error);
 //         res.status(500).json({ message: "Internal server error" });
 //     }
 // });
@@ -170,6 +196,10 @@ app.put("/notes/:id", middleWare, async (req: Request, res: Response): Promise<a
         if (updateData.content) note.content = updateData.content;
         if (updateData.tags) note.tags = updateData.tags;
 
+        if (updateData.aiSummary !== undefined) {
+            note.aiSummary = updateData.aiSummary;
+        }
+
         await note.save(); 
 
         res.json({ message: "Note updated successfully", note });
@@ -178,6 +208,7 @@ app.put("/notes/:id", middleWare, async (req: Request, res: Response): Promise<a
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
 
 
 
