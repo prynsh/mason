@@ -194,6 +194,9 @@ importers:
       mongoose:
         specifier: ^8.10.1
         version: 8.10.1
+      typescript:
+        specifier: ^5.7.3
+        version: 5.7.3
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*

@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await axios.post("http://localhost:3001/signup", { email, password });
 
       if (res.status === 200) {
-        window.location.href = "/signin"; // Redirect after signup
+        window.location.href = "/signin";
       } else {
         set({ error: "Failed to create account. Please try again." });
       }

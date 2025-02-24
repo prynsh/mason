@@ -15,6 +15,7 @@ interface NoteState {
   setLoading: (loading: boolean) => void;
   validateForm: () => boolean;
   createNote: (token: string, router: any, generateContent: (data: { title: string; content: string }) => Promise<string>) => Promise<void>;
+  resetStatus: () => void;
 }
 
 export const useNoteStore = create<NoteState>((set, get) => ({
@@ -30,6 +31,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
   setContent: (content) => set({ content }),
   setTags: (tags) => set({ tags }),
   setLoading: (loading) => set({ loading }),
+  resetStatus: () => set({ error: "", success: "" }),
 
   validateForm: () => {
     const { title, content, tags } = get();

@@ -24,7 +24,7 @@ export default function Dashboard() {
     toggleAISummary,
     openModal,
     closeModal,
-    setCurrentPage, // Ensure this function exists in the store
+    setCurrentPage,
   } = useNoteManagementStore();
 
   const ref = useRef<HTMLDivElement>(null!);

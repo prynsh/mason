@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useNoteStore } from '../store/useNote';
 import { TitleInput } from './titleInput';
@@ -23,6 +23,13 @@ export default function CreatePage() {
   const setContent = useNoteStore(state => state.setContent);
   const setTags = useNoteStore(state => state.setTags);
   const createNote = useNoteStore(state => state.createNote);
+  const resetStatus = useNoteStore(state => state.resetStatus);
+
+  useEffect(() => {
+    if (error || success) {
+      resetStatus();
+    }
+  }, [title, content, tags, error, success, resetStatus]);
 
   const handleSubmit = React.useCallback(() => {
     const token = localStorage.getItem('token');

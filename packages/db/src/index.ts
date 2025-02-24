@@ -1,7 +1,9 @@
-import mongoose from "mongoose";  
-//"AIzaSyC4tbOPp06kyZKBCH8TMiQ5NYA4O7neTWg"
-mongoose.connect("mongodb+srv://Mason:WVnRatXunvZkdaih@mason.gko53.mongodb.net/smart_notes");
+import mongoose from "mongoose";
+import dotenv from "dotenv"
 
+dotenv.config();
+
+  mongoose.connect(process.env.DATABASE_URL)
 
 const userSchema = new mongoose.Schema({
   email: {

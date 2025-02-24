@@ -6,7 +6,6 @@ import Link from "next/link"
 import { useAuthStore } from "../store/authStore"
 import { AuthCard, EmailInput, PasswordInput, AuthButton } from "./authComponents"
 
-// Memoized form content component
 const LoginFormContent = memo(() => {
   const email = useAuthStore((state) => state.email)
   const setEmail = useAuthStore((state) => state.setEmail)
